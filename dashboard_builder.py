@@ -927,7 +927,7 @@ def heatmap_panel(
         dataFormat="tsbuckets",
         yBucketBound="upper",
         tooltip=tooltip,
-        extraJson={"tooltip": {"showHistogram": True}},
+        extraJson={"tooltip": {"showHistogram": True, "show": True}},
         hideZeroBuckets=True,
         # Limit data points, because too many data points slows browser when
         # the resolution is too high.
