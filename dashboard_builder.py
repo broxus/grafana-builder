@@ -925,7 +925,7 @@ def heatmap_panel(
         yAxis=yaxis,
         color=color,
         dataFormat="tsbuckets",
-        yBucketBound="upper",
+        yBucketBound="lower",
         tooltip=tooltip,
         extraJson={"tooltip": {"showHistogram": True, "show": True}},
         hideZeroBuckets=True,

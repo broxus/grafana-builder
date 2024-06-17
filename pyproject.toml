@@ -1,4 +1,4 @@
 [project]
 name = 'dashboard_builder'
 dependencies = ["attrs~=23.2.0", "grafanalib~=0.7.1"]
-version = '0.1.0'
+version = '0.1.1'
