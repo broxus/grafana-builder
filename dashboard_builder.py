@@ -909,7 +909,7 @@ def heatmap_panel(
         "_bucket"
     ), f"'{metric}' should be a histogram metric with '_bucket' suffix"
     t = target(
-        expr=expr_sum_rate(metric, label_selectors=label_selectors, by_labels=["le"]),
+        expr=expr_sum_increase(metric, label_selectors=label_selectors, by_labels=["le"]),
     )
     # Make sure targets are in heatmap format.
     t.format = "heatmap"
