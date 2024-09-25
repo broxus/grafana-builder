@@ -69,7 +69,8 @@ class Expr(object):
     aggr_param: str = attr.ib(default="", validator=instance_of(str))
     func: str = attr.ib(default="", validator=instance_of(str))
     range_selector: str = attr.ib(default="", validator=instance_of(str))
-    label_selectors: list[str] = attr.ib(default=[], validator=instance_of(list))
+    label_selectors: list[str] = attr.ib(default=[],
+                                         validator=instance_of(list))
     by_labels: list[str] = attr.ib(default=[], validator=instance_of(list))
     default_label_selectors: list[str] = attr.ib(
         default=[
@@ -77,25 +78,29 @@ class Expr(object):
         ],
         validator=instance_of(list),
     )
-    skip_default_instance: bool = attr.ib(default=False, validator=instance_of(bool))
+    skip_default_instance: bool = attr.ib(default=False,
+                                          validator=instance_of(bool))
     extra_expr: str = attr.ib(default="", validator=instance_of(str))
 
     def __str__(self) -> str:
         aggr_opeator = self.aggr_op if self.aggr_op else ""
         aggr_param = self.aggr_param + "," if self.aggr_param else ""
         by_clause = (
-            "by ({})".format(", ".join(self.by_labels)) if self.by_labels else ""
+            "by ({})".format(
+                ", ".join(self.by_labels)) if self.by_labels else ""
         )
         func = self.func if self.func else ""
         label_selectors = self.default_label_selectors + self.label_selectors
         if self.skip_default_instance:
             # Remove instance=~"$instance"
-            label_selectors = [l for l in label_selectors if "$instance" not in l]
+            label_selectors = [l for l in label_selectors if
+                               "$instance" not in l]
         assert all(
             ("=" in item or "~" in item) for item in label_selectors
         ), f"Not all items contain '=' or '~', invalid {self.label_selectors}"
         instant_selectors = (
-            "{{{}}}".format(",".join(label_selectors)) if label_selectors else ""
+            "{{{}}}".format(
+                ",".join(label_selectors)) if label_selectors else ""
         )
         range_selector = f"[{self.range_selector}]" if self.range_selector else ""
         extra_expr = self.extra_expr if self.extra_expr else ""
@@ -476,7 +481,8 @@ def expr_simple(
     return expr
 
 
-def expr_operator(lhs: Union[Expr, str], operator: str, rhs: Union[Expr, str]) -> str:
+def expr_operator(lhs: Union[Expr, str], operator: str,
+                  rhs: Union[Expr, str]) -> str:
     return f"""({lhs} {operator} {rhs})"""
 
 
@@ -506,7 +512,7 @@ def expr_histogram_quantile(
         metrics + "_bucket",
         label_selectors=label_selectors,
         by_labels=by_labels + ["le"],
-        )
+    )
     # histogram_quantile({quantile}, {sum_rate_of_buckets})
     return expr_aggr(
         metric=f"{sum_rate_of_buckets}",
@@ -574,13 +580,13 @@ def expr_histogram_avg(
             metrics + "_sum",
             label_selectors=label_selectors,
             by_labels=by_labels,
-            ),
+        ),
         "/",
         expr_sum_rate(
             metrics + "_count",
             label_selectors=label_selectors,
             by_labels=by_labels,
-            ),
+        ),
     )
 
 
@@ -592,7 +598,8 @@ def target(
         interval_factor=1,  # Prefer "high" resolution
 ) -> Target:
     if legend_format is None and isinstance(expr, Expr) and expr.by_labels:
-        legend_format = "-".join(map(lambda x: "{{" + f"{x}" + "}}", expr.by_labels))
+        legend_format = "-".join(
+            map(lambda x: "{{" + f"{x}" + "}}", expr.by_labels))
     return Target(
         expr=f"{expr}",
         hide=hide,
@@ -637,7 +644,8 @@ class Layout:
     current_row_y_pos: int
     current_row_x_pos: int
 
-    def __init__(self, title, collapsed=True, repeat: Optional[str] = None) -> None:
+    def __init__(self, title, collapsed=True,
+                 repeat: Optional[str] = None) -> None:
         extraJson = None
         if repeat:
             extraJson = {"repeat": repeat}
@@ -727,7 +735,8 @@ def yaxis(format: str, log_base=1) -> YAxis:
     return YAxis(format=format, logBase=log_base)
 
 
-def yaxes(left_format: str, right_format: Optional[str] = None, log_base=1) -> YAxes:
+def yaxes(left_format: str, right_format: Optional[str] = None,
+          log_base=1) -> YAxes:
     ya = YAxes(left=yaxis(left_format, log_base=log_base))
     if right_format is not None:
         ya.right = yaxis(right_format, log_base=log_base)
@@ -904,12 +913,14 @@ def heatmap_panel(
         color=heatmap_color(),
         decimals=1,
         data_source=DATASOURCE,
+        rate_interval="$__rate_interval",
 ) -> Panel:
     assert metric.endswith(
         "_bucket"
     ), f"'{metric}' should be a histogram metric with '_bucket' suffix"
     t = target(
-        expr=expr_sum_increase(metric, label_selectors=label_selectors, by_labels=["le"]),
+        expr=expr_sum_increase(metric, label_selectors=label_selectors,
+                               by_labels=["le"], range_selector=rate_interval),
     )
     # Make sure targets are in heatmap format.
     t.format = "heatmap"
